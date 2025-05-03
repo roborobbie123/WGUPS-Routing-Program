@@ -17,8 +17,9 @@ class Truck:
         if package in self.packages:
             self.packages.remove(package)
             self.miles += distance
-            package.updateStatus('Delivered', time)
+            package.update_status('DELIVERED', time)
             self.location = package.address
+            print(f"Package {package.id} is being removed from truck")
 
     def print_packages(self):
         for package in self.packages:
@@ -31,6 +32,3 @@ class Truck:
         return (f"Truck location: {self.location}, "
                 f"Miles driven: {self.miles}, "
                 f"# of packages: {len(self.packages)}")
-
-
-

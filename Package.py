@@ -15,7 +15,5 @@ class Package:
         if time:
             self.delivery_time = time
 
-
-
     def __str__(self):
         return f"Package ID: {self.id}, Address: {self.address}, City: {self.city}, Zip: {self.zip_code}, Deadline: {self.deadline}, Weight: {self.weight}, Status: {self.status}, Delivery Time: {self.delivery_time}"
