@@ -25,7 +25,7 @@ class HashTable:
 
         selected_bucket.append((key, item))
 
-    def search(self, id):
+    def lookup(self, id):
 
         bucket_index = hash(id) % len(self.table)
         selected_bucket = self.table[bucket_index]

@@ -18,15 +18,40 @@ with open("data/distances.csv") as distanceData:
     distances = csv.reader(distanceData)
     distances = list(distances)
 
-packageMap = HashTable()
 
-
-def loadPackageData(data):
+def loadPackageData(data, map):
     for row in data:
         p = Package(*row)
-        packageMap.insert(row[0], p)
-    packageMap.print_map()
+        map.insert(row[0], p)
+    return map
 
-def loadDistanceData(data):
 
-def loadAddressData(data):
+packageMap = loadPackageData(packages, HashTable())
+
+
+def loadTrucks(packageData):
+    truck1 = Truck()
+    for i in range(1, 17):
+        package = packageData.lookup(i)
+        if package:
+            truck1.load_package(package)
+
+    truck2 = Truck()
+    for i in range(17, 33):
+        package = packageData.lookup(i)
+        if package:
+            truck2.load_package(package)
+
+    truck3 = Truck()
+    for i in range(33, 40):
+        package = packageData.lookup(i)
+        if package:
+            truck3.load_package(package)
+
+    return truck1, truck2, truck3
+
+
+truck1, truck2, truck3 = loadTrucks(packageMap)
+truck1.print_packages()
+truck2.print_packages()
+truck3.print_packages()
