@@ -55,3 +55,42 @@ truck1, truck2, truck3 = loadTrucks(packageMap)
 truck1.print_packages()
 truck2.print_packages()
 truck3.print_packages()
+
+
+# def distance_function:
+# takes current position and maps a distance to every other address
+# returns the address with the smallest distance
+
+# while truck has packages
+# look through truck packages
+# find the nearest package address to the current position: distance_function(current position)
+# update package status to ETA
+# set current position to that address
+# add miles to truck
+# set the delivery time and status as DELIVERED
+# remove package from truck package list
+
+
+def find_nearest_address(truck, current_location, distance_function):
+    nearest_package = None
+    nearest_distance = float('inf')
+
+    for package in truck.packages:
+        distance = distance_function(current_location, package.address)
+
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_package = package
+
+    return nearest_package, nearest_distance
+
+
+def nearest_neighbor(truck1, distance_function):
+    current_location = "HUB"
+
+    while truck1.package_count() > 0:
+        nearest_package, nearest_distance = find_nearest_address(truck1, current_location, distances)
+        nearest_package.updateStatus("DELIVERED")
+
+        truck1.deliver(nearest_package, nearest_distance, datetime.time)
+        current_location = nearest_package.address

@@ -24,6 +24,9 @@ class Truck:
         for package in self.packages:
             print(package.__str__())
 
+    def package_count(self):
+        return len(self.packages)
+
     def __str__(self):
         return (f"Truck location: {self.location}, "
                 f"Miles driven: {self.miles}, "
