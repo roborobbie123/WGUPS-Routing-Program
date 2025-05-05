@@ -8,12 +8,20 @@ class Package:
         self.weight = weight
         self.deadline = deadline
         self.status = "At hub"
-        self.delivery_time = None
+        self.delivery_time = None  # in minutes since 8:00 AM
+        self.delivery_time_formatted = None
 
-    def update_status(self, update, time):
+    def update_status(self, update, time=None):
         self.status = update
         if time:
             self.delivery_time = time
+            hours = 8 + (self.delivery_time // 60)
+            minutes = self.delivery_time % 60
+            self.delivery_time_formatted = f"{int(hours):02}:{int(minutes):02}"
 
     def __str__(self):
-        return f"Package ID: {self.id}, Address: {self.address}, City: {self.city}, Zip: {self.zip_code}, Deadline: {self.deadline}, Weight: {self.weight}, Status: {self.status}, Delivery Time: {self.delivery_time}"
+        return (
+            f"Package ID: {self.id}, Address: {self.address}, City: {self.city}, "
+            f"Zip: {self.zip_code}, Deadline: {self.deadline}, Weight: {self.weight}, "
+            f"Status: {self.status}, Delivery Time: {self.delivery_time_formatted}"
+        )

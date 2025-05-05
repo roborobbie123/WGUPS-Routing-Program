@@ -115,7 +115,9 @@ def nearest_neighbor(truck, distances, addressData):
     packages_delivered = 0
 
     special_package_id = '9'
-    special_package_time = 140  # 10:20 AM
+    special_package_time = 140
+    for package in truck.packages:
+        package.update_status("EN ROUTE")
 
     # === Phase 1: Deliver all packages except Package 9 ===
     while any(p.id != special_package_id for p in truck.packages):
@@ -139,7 +141,7 @@ def nearest_neighbor(truck, distances, addressData):
         current_location = next_address
 
         for package in packages_at_address:
-            truck.deliver(package, time_str)
+            truck.deliver(package, minutes)
             packages_delivered += 1
             print(package.id)
 
@@ -164,7 +166,7 @@ def nearest_neighbor(truck, distances, addressData):
             hours = minutes // 60 + 8
             remaining_minutes = minutes % 60
             time_str = f"{int(hours):02}:{int(remaining_minutes):02}"
-            truck.deliver(remaining_package, time_str)
+            truck.deliver(remaining_package, minutes)
             packages_delivered += 1
             print(f"Delivered Package 9 to {current_location} at {time_str}")
 
@@ -194,7 +196,7 @@ print(f"Truck 2 ==> Miles: {round(truck2.miles, 2)}, Completed Time: {time2} AM,
 print(f"Truck 3 ==> Miles: {round(truck3.miles, 2)}, Completed Time: {time3} AM, Deliveries: {delivered3}")
 
 total_miles = round(truck1.miles + truck2.miles + truck3.miles, 2)
-print(total_miles)
+
 
 # for row in distanceMatrix:
 #     print(row)
@@ -202,34 +204,74 @@ print(total_miles)
 # for row in addressMatrix:
 #     print(row)
 
+def get_time_in_minutes(time_type):
+    while True:
+        # Prompt user for time input in HH:MM format
+        user_input = input(f"Please enter the {time_type} time in HH:MM format: ")
 
-# print("\n================== WGUPS ROUTING PROGRAM ==================\n")
-# while True:
-#     print("1. Print All Package Status and Total Mileage\n")
-#     print("2. Get a Single Package Status with a Time\n")
-#     print("3. Get All Package Status with a Time\n")
-#     print("4. Exit the Program\n")
-#
-#     choice = input("Enter your choice (1-4): ")
-#     print()
-#
-#     if choice == '1':
-#         for i in range(1, 41):
-#             package = packageMap.lookup(i)
-#             print(f"Package: {package.id}, Status: {package.status}")
-#         print(f"Total mileage: {total_miles}\n")
-#     elif choice == '2':
-#         selection = input("Enter a package ID: ")
-#         id = int(selection)
-#         if id < 1 or id > 40:
-#             print("Invalid package ID")
-#         else:
-#             package = packageMap.lookup(id)
-#             print(f"Package: {package.id}, Status: {package.status}, Time: {package.delivery_time}\n")
-#     elif choice == '3':
-#         print("")
-#     elif choice == '4':
-#         print("Exiting program...")
-#         break
-#     else:
-#         print("Invalid input. Please try again")
+        # Error check for correct format (HH:MM)
+        if len(user_input) == 5 and user_input[2] == ':':
+            hours_str, minutes_str = user_input.split(':')
+
+            # Validate if hours and minutes are numeric and within valid ranges
+            if hours_str.isdigit() and minutes_str.isdigit():
+                hours = int(hours_str)
+                minutes = int(minutes_str)
+
+                if 0 <= hours <= 23 and 0 <= minutes <= 59:
+                    # Convert to minutes since midnight
+                    total_minutes = hours * 60 + minutes
+                    return total_minutes
+                else:
+                    print("Invalid time range. Hours should be between 00-23 and minutes between 00-59.")
+            else:
+                print("Invalid input. Please ensure hours and minutes are numeric.")
+        else:
+            print("Invalid format. Please enter time in HH:MM format.")
+
+
+print("\n================== WGUPS ROUTING PROGRAM ==================\n")
+while True:
+    print("1. Print All Package Status and Total Mileage\n")
+    print("2. Get a Single Package Status with a Time\n")
+    print("3. Get All Package Status with a Time\n")
+    print("4. Package status by time")
+    print("5. Exit the Program\n")
+
+    choice = input("Enter your choice (1-4): ")
+    print()
+
+    if choice == '1':
+        for i in range(1, 41):
+            package = packageMap.lookup(i)
+            print(f"Package: {package.id}, Status: {package.status}")
+        print(f"Total mileage: {total_miles}\n")
+    elif choice == '2':
+        selection = input("Enter a package ID: ")
+        id = int(selection)
+        if id < 1 or id > 40:
+            print("Invalid package ID")
+        else:
+            package = packageMap.lookup(id)
+            print(f"Package: {package.id}, Status: {package.status}, Time: {package.delivery_time_formatted}\n")
+    elif choice == '3':
+        for i in range(1, 41):
+            package = packageMap.lookup(i)
+            print(f"Package: {package.id}, Status: {package.status} Time: {package.delivery_time_formatted}")
+    elif choice == '4':
+        minutes = get_time_in_minutes("end") - 480
+        hours = ((minutes + 480) // 60) % 24  # Keep it within 24 hours
+        mins = minutes % 60
+        print(f"Status of packages at {hours:02}:{mins:02}")
+
+        for i in range(1, 41):
+            package = packageMap.lookup(i)
+            if package.delivery_time <= minutes:
+                print(f"Package: {package.id} Status: {package.status} Delivered at: {package.delivery_time_formatted}")
+            else:
+                print(f"Package: {package.id} Status: EN ROUTE Deadline: {package.deadline}")
+    elif choice == '5':
+        print("Exiting program...")
+        break
+    else:
+        print("Invalid input. Please try again")
