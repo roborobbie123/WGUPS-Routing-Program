@@ -14,11 +14,10 @@ class Truck:
         if len(self.packages) < self.capacity:
             self.packages.append(package)
 
-    def deliver(self, package, distance, time):
+    def deliver(self, package, time):
         if package in self.packages:
             self.packages.remove(package)
             self.delivered_packages.append(package)
-            self.miles += distance
             package.update_status('DELIVERED', time)
             self.location = package.address
             # print(f"Package {package.id} is being removed from truck")
