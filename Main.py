@@ -84,17 +84,23 @@ def loadTrucks(packageData):
     truck1 = Truck()
     truck1_packages = [14, 15, 16, 34, 25, 26, 24, 22, 19, 20, 21, 35, 36, 37, 9]
     for num in truck1_packages:
-        truck1.load_package(packageData.lookup(num))
+        package = packageData.lookup(num)
+        package.set_truck(1)
+        truck1.load_package(package)
 
     truck2 = Truck()
     truck2_packages = [23, 27, 28, 29, 30, 31, 32, 33, 38, 39, 40, 17, 18]
     for num in truck2_packages:
-        truck2.load_package(packageData.lookup(num))
+        package = packageData.lookup(num)
+        package.set_truck(2)
+        truck2.load_package(package)
 
     truck3 = Truck()
     truck3_packages = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13]
     for num in truck3_packages:
-        truck3.load_package(packageData.lookup(num))
+        package = packageData.lookup(num)
+        package.set_truck(3)
+        truck3.load_package(package)
 
     return truck1, truck2, truck3
 
@@ -116,14 +122,18 @@ def nearest_neighbor(truck, distances, addressData):
 
     special_package_id = '9'
     special_package_time = 140
+
+    late_packages = ['6', '25', '28', '32']
+    late_package_time = 65
+
     for package in truck.packages:
         package.update_status("EN ROUTE")
 
     # === Phase 1: Deliver all packages except Package 9 ===
-    while any(p.id != special_package_id for p in truck.packages):
+    while any(p.id != special_package_id and p.id not in late_packages for p in truck.packages):
 
         # Only consider addresses with packages not including package 9
-        eligible_packages = [p for p in truck.packages if p.id != special_package_id]
+        eligible_packages = [p for p in truck.packages if p.id != special_package_id and p.id not in late_packages]
         address_set = {p.address for p in eligible_packages}
 
         next_address, distance = get_distance(current_location, distances, addressData, address_set, visited_addresses)
@@ -136,7 +146,7 @@ def nearest_neighbor(truck, distances, addressData):
         remaining_minutes = minutes % 60
         time_str = f"{int(hours):02}:{int(remaining_minutes):02}"
 
-        packages_at_address = [p for p in truck.packages if p.address == next_address and p.id != special_package_id]
+        packages_at_address = [p for p in truck.packages if p.address == next_address and p.id != special_package_id and p.id not in late_packages]
 
         current_location = next_address
 
@@ -150,12 +160,19 @@ def nearest_neighbor(truck, distances, addressData):
         print(f"Delivered to {current_location}. Load: {len(truck.packages)}. Time: {time_str}")
 
     # === Phase 2: Deliver Package 9 after 10:20 AM ===
-    remaining_package = next((p for p in truck.packages if p.id == special_package_id), None)
-    if remaining_package:
-        if minutes < special_package_time:
-            wait_minutes = special_package_time - minutes
-            minutes += wait_minutes
-            print(f"Waiting until 10:20 AM to deliver Package 9...")
+    remaining_packages = [p for p in truck.packages if p.id == special_package_id or p.id in late_packages]
+    for remaining_package in remaining_packages:
+        if remaining_package:
+            if remaining_package.id == special_package_id:
+                if minutes < special_package_time:
+                    wait_minutes = special_package_time - minutes
+                    minutes += wait_minutes
+                    print(f"Waiting until 10:20 AM to deliver Package 9...")
+            if remaining_package.id in late_packages:
+                if minutes < late_package_time:
+                    wait_minutes = late_package_time - minutes
+                    minutes += wait_minutes
+                    print(f"Waiting until 9:05 AM to deliver Package...")
 
         # Find distance to its address
         next_address, distance = get_distance(current_location, distances, addressData, {remaining_package.address}, [])
@@ -232,9 +249,9 @@ def get_time_in_minutes(time_type):
 
 print("\n================== WGUPS ROUTING PROGRAM ==================\n")
 while True:
-    print("1. Print All Package Status and Total Mileage\n")
-    print("2. Get a Single Package Status with a Time\n")
-    print("3. Get All Package Status with a Time\n")
+    print("1. Print All Package Status and Total Mileage")
+    print("2. Get a Single Package Status with a Time")
+    print("3. Get All Package Status with a Time")
     print("4. Package status by time")
     print("5. Exit the Program\n")
 
@@ -257,7 +274,7 @@ while True:
     elif choice == '3':
         for i in range(1, 41):
             package = packageMap.lookup(i)
-            print(f"Package: {package.id}, Status: {package.status} Time: {package.delivery_time_formatted}")
+            print(f"Package: {package.id}, Address: {package.address}, Deadline: {package.deadline}, Status: {package.status}, Time: {package.delivery_time_formatted}, Truck: {package.truck}")
     elif choice == '4':
         minutes = get_time_in_minutes("end") - 480
         hours = ((minutes + 480) // 60) % 24  # Keep it within 24 hours
@@ -267,7 +284,7 @@ while True:
         for i in range(1, 41):
             package = packageMap.lookup(i)
             if package.delivery_time <= minutes:
-                print(f"Package: {package.id} Status: {package.status} Delivered at: {package.delivery_time_formatted}")
+                print(f"Package: {package.id}, Address: {package.address}, Deadline: {package.deadline}, Status: {package.status}, Time: {package.delivery_time_formatted}, Truck: {package.truck}")
             else:
                 print(f"Package: {package.id} Status: EN ROUTE Deadline: {package.deadline}")
     elif choice == '5':

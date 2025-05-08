@@ -10,6 +10,7 @@ class Package:
         self.status = "At hub"
         self.delivery_time = None  # in minutes since 8:00 AM
         self.delivery_time_formatted = None
+        self.truck = 0
 
     def update_status(self, update, time=None):
         self.status = update
@@ -18,6 +19,9 @@ class Package:
             hours = 8 + (self.delivery_time // 60)
             minutes = self.delivery_time % 60
             self.delivery_time_formatted = f"{int(hours):02}:{int(minutes):02}"
+
+    def set_truck(self, num):
+        self.truck = num
 
     def __str__(self):
         return (
