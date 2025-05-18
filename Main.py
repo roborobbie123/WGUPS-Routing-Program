@@ -82,21 +82,21 @@ def get_distance(location, distanceData, addressData, packageAddresses, visited_
 
 def loadTrucks(packageData):
     truck1 = Truck()
-    truck1_packages = [14, 15, 16, 34, 25, 26, 24, 22, 19, 20, 21, 35, 36, 37, 9]
+    truck1_packages = [1, 13, 14, 15, 16, 20, 29, 30, 31, 34, 37, 40]
     for num in truck1_packages:
         package = packageData.lookup(num)
         package.set_truck(1)
         truck1.load_package(package)
 
     truck2 = Truck()
-    truck2_packages = [23, 27, 28, 29, 30, 31, 32, 33, 38, 39, 40, 17, 18]
+    truck2_packages = [3, 6, 12, 17, 18, 19, 21, 22, 23, 24, 26, 27, 35, 36, 38, 39]
     for num in truck2_packages:
         package = packageData.lookup(num)
         package.set_truck(2)
         truck2.load_package(package)
 
     truck3 = Truck()
-    truck3_packages = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13]
+    truck3_packages = [2, 4, 5, 6, 7, 8, 9, 10, 11, 25, 28, 32, 33]
     for num in truck3_packages:
         package = packageData.lookup(num)
         package.set_truck(3)
@@ -270,7 +270,7 @@ while True:
             print("Invalid package ID")
         else:
             package = packageMap.lookup(id)
-            print(f"Package: {package.id}, Status: {package.status}, Time: {package.delivery_time_formatted}\n")
+            print(f"Package: {package.id}, Address: {package.address}, Deadline: {package.deadline}, Status: {package.status}, Time: {package.delivery_time_formatted}, Truck: {package.truck}")
     elif choice == '3':
         for i in range(1, 41):
             package = packageMap.lookup(i)
@@ -286,7 +286,9 @@ while True:
             if package.delivery_time <= minutes:
                 print(f"Package: {package.id}, Address: {package.address}, Deadline: {package.deadline}, Status: {package.status}, Time: {package.delivery_time_formatted}, Truck: {package.truck}")
             else:
-                print(f"Package: {package.id} Status: EN ROUTE Deadline: {package.deadline}")
+                print(
+                    f"Package: {package.id}, Address: {package.address}, Deadline: {package.deadline}, Status: EN "
+                    f"ROUTE, Truck: {package.truck}")
     elif choice == '5':
         print("Exiting program...")
         break
