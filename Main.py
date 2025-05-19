@@ -82,7 +82,7 @@ def get_distance(location, distanceData, addressData, packageAddresses, visited_
 
 def loadTrucks(packageData):
     truck1 = Truck()
-    truck1_packages = [1, 13, 14, 15, 16, 20, 29, 30, 31, 34, 37, 40]
+    truck1_packages = [1, 13, 14, 15, 16, 20, 29, 30, 31, 34, 37, 28, 25]
     for num in truck1_packages:
         package = packageData.lookup(num)
         package.set_truck(1)
@@ -96,7 +96,7 @@ def loadTrucks(packageData):
         truck2.load_package(package)
 
     truck3 = Truck()
-    truck3_packages = [2, 4, 5, 6, 7, 8, 9, 10, 11, 25, 28, 32, 33]
+    truck3_packages = [2, 4, 5, 6, 7, 8, 9, 10, 11, 40, 32, 33]
     for num in truck3_packages:
         package = packageData.lookup(num)
         package.set_truck(3)
@@ -185,7 +185,6 @@ def nearest_neighbor(truck, distances, addressData):
             time_str = f"{int(hours):02}:{int(remaining_minutes):02}"
             truck.deliver(remaining_package, minutes)
             packages_delivered += 1
-            print(f"Delivered Package 9 to {current_location} at {time_str}")
 
     return time_str, packages_delivered
 
