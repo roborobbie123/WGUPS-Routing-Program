@@ -122,6 +122,7 @@ def nearest_neighbor(truck, distances, addressData):
 
     special_package_id = '9'
     special_package_time = 140
+    special_package_address = '410 S State St'
 
     late_packages = ['6', '25', '28', '32']
     late_package_time = 65
@@ -132,7 +133,7 @@ def nearest_neighbor(truck, distances, addressData):
     # === Phase 1: Deliver all packages except Package 9 ===
     while any(p.id != special_package_id and p.id not in late_packages for p in truck.packages):
 
-        # Only consider addresses with packages not including package 9
+        # Only consider addresses with packages not including package 9 or late packages
         eligible_packages = [p for p in truck.packages if p.id != special_package_id and p.id not in late_packages]
         address_set = {p.address for p in eligible_packages}
 
@@ -168,6 +169,8 @@ def nearest_neighbor(truck, distances, addressData):
                     wait_minutes = special_package_time - minutes
                     minutes += wait_minutes
                     print(f"Waiting until 10:20 AM to deliver Package 9...")
+                remaining_package.address = special_package_address
+
             if remaining_package.id in late_packages:
                 if minutes < late_package_time:
                     wait_minutes = late_package_time - minutes
@@ -282,6 +285,11 @@ while True:
 
         for i in range(1, 41):
             package = packageMap.lookup(i)
+            if package.id == '9':
+                if minutes < 140:
+                    package.address = '300 State St'
+                else:
+                    package.address = '410 S State St'
             if package.delivery_time <= minutes:
                 print(f"Package: {package.id}, Address: {package.address}, Deadline: {package.deadline}, Status: {package.status}, Time: {package.delivery_time_formatted}, Truck: {package.truck}")
             else:
